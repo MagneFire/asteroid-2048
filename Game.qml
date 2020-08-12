@@ -46,7 +46,6 @@ Item {
             // If can move to empty spot or spot with same value.
             if ((cell1 !== 0 && cell1 === cell2) || (cell1 !== 0 && cell2 === 0)) {
                 cells[x1][y1] = 0;
-                //console.log("moving: " + x1 + " y: "  + y1)
 
                 for (var i=0;i<logic.rows*logic.cols;i++) {
                     if ((cellsGrid.itemAt(i).x1 == -1) || (cellsGrid.itemAt(i).y1 == -1)) continue
@@ -54,7 +53,6 @@ Item {
                         cellsGrid.itemAt(i).x1 = x2
                         cellsGrid.itemAt(i).y1 = y2
                         animationTimer.start()
-                        //console.log("FOUND: " + i +" x: " + x1 + "->" + x2 +" y: " + y1 + "->" + y2)
                         break
                     }
                 }
@@ -72,7 +70,6 @@ Item {
                         cellsGrid.itemAt(i).pop = true
                     }
                 }
-                //console.log("moveCell::Score: " + score)
                 return false;
             }
 
@@ -129,10 +126,7 @@ Item {
                     }
                 }
             }
-            if (!emptyCells.length) {
-                //console.log("ERR!:randCell:: No more empty cells available!")
-                return
-            }
+            if (!emptyCells.length) return
 
             var emptyCell = emptyCells[Math.floor(Math.random()*emptyCells.length)]
             var x = emptyCell[0]
@@ -142,15 +136,12 @@ Item {
             // UI
             var emptyGrid = emptyGridCells[0]
             emptyGridCells.shift()
-            //console.log("randCell::Using random cell: " + emptyCell + " x: " + x + " y: " + y + " value: " + cells[x][y] + " id: " + emptyGrid)
 
             cellsGrid.itemAt(emptyGrid).animateMove = false
             cellsGrid.itemAt(emptyGrid).val = cells[x][y]
             cellsGrid.itemAt(emptyGrid).x1 = x
             cellsGrid.itemAt(emptyGrid).y1 = y
             cellsGrid.itemAt(emptyGrid).animateMove = true
-
-            //console.log("randCell::Empty cells left: " + (emptyCells.length-1))
 
             if ((emptyCells.length<=1) && !movePossible()) {
                 console.log("randCell::Moving is no longer possbile! GAME OVER!!")
@@ -164,7 +155,6 @@ Item {
                 for (var j=i+1;j<rows*cols;j++) {
                     if ((cellsGrid.itemAt(i).x1 == -1) || (cellsGrid.itemAt(i).y1 == -1)) continue
                     if ((cellsGrid.itemAt(i).x1 === cellsGrid.itemAt(j).x1) && (cellsGrid.itemAt(i).y1 === cellsGrid.itemAt(j).y1)) {
-                        //console.log("onTriggered:: FOUND DUPE i: " + j + " x: " + cellsGrid.itemAt(j).x1 + " y: " + cellsGrid.itemAt(j).y1 + " v: " + cellsGrid.itemAt(j).children[0].text)
                         cellsGrid.itemAt(j).animateMove = false
                         cellsGrid.itemAt(j).val = 0
                         cellsGrid.itemAt(j).x1 = -1
@@ -176,7 +166,6 @@ Item {
         }
 
         function reset() {
-            //console.log("reset::Loading game...")
             for (var i=0;i<4;i++) {
                 cells[i] = []
                 for (var j=0;j<4;j++) {
@@ -201,12 +190,6 @@ Item {
             onTriggered: {
                 logic.removeDuplicateGridCells()
                 logic.randCell()
-                /*for (var i=0;i<4;i++) {
-                    console.log("\t" + logic.cells[0][i] + "\t" + 
-                                logic.cells[1][i] + "\t" + 
-                                logic.cells[2][i] + "\t" + 
-                                logic.cells[3][i] + "\t")
-                }*/
             }
         }
 
@@ -291,6 +274,7 @@ Item {
                 scale: val ? (pop ? 1.1 : 1) : 0
                 onScaleChanged: if (scale >= 1.1) pop = false
                 radius: 3
+                visible: ((x1 != -1) && (y1 !=-1))
                 Behavior on x { enabled: animateMove; NumberAnimation { duration: 100} }
                 Behavior on y { enabled: animateMove; NumberAnimation { duration: 100} }
                 Behavior on scale { NumberAnimation { duration: 100} }
