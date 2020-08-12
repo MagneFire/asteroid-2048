@@ -295,11 +295,11 @@ Item {
                 Behavior on y { enabled: animateMove; NumberAnimation { duration: 100} }
                 Behavior on scale { NumberAnimation { duration: 100} }
                 Text {
-                    id: lbl
                     anchors.fill: parent
                     color: val <= 4 ? "#000" : "#f9f6f2"
                     text: parent.val
                     scale: parent.scale
+                    font.bold: true
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                 }
