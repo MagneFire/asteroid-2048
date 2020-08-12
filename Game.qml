@@ -4,6 +4,9 @@ import Nemo.Configuration 1.0
 Item {
     id: main
     anchors.fill: parent
+    property bool isDesktop: (typeof(desktop) !== "undefined")
+    property bool isApp: !isDesktop && !isSettings
+    property bool isSettings: (typeof(layerStack) !== "undefined")
 
     Item {
         id: logic
@@ -204,7 +207,7 @@ Item {
             }
         }
 
-        Component.onCompleted: reset()
+        Component.onCompleted: if (!isSettings) reset()
     }
 
     Item {
@@ -371,7 +374,7 @@ Item {
             height: parent.height
             anchors.centerIn: parent
 
-            property bool swipeMode: true
+            property bool swipeMode: !isDesktop
 
             property int threshold: width*0.01
             property string gesture: ""
@@ -425,7 +428,7 @@ Item {
             }
         }
 
-        Rectangle{
+        Rectangle {
             property string gesture: ""
             focus: true
             Keys.onPressed: {
