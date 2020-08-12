@@ -1,5 +1,6 @@
 import QtQuick 2.9
 import Nemo.Configuration 1.0
+import org.nemomobile.lipstick 0.1
 
 Item {
     id: main
@@ -7,6 +8,47 @@ Item {
     property bool isDesktop: (typeof(desktop) !== "undefined")
     property bool isApp: !isDesktop && !isSettings
     property bool isSettings: (typeof(layerStack) !== "undefined")
+
+    property bool watchfaceMode: isDesktop
+    // This holds the intermediate watchface source
+    // needed to keep track of what the previous watchface was when it changed.
+    property var newWatchFaceSource
+
+    ConfigurationValue {
+        id: previousWatchFaceSource
+        key: "/2048/watchface"
+        defaultValue: "file:///usr/share/asteroid-launcher/watchfaces/000-default-digital.qml"
+    }
+    ConfigurationValue {
+        id: currentWatchFaceSource
+        key: "/desktop/asteroid/watchface"
+        defaultValue: "file:///usr/share/asteroid-launcher/watchfaces/000-default-digital.qml"
+        onValueChanged: {
+            // Only keep track of watchface changes in non-desktop(i.e. settings) mode.
+            if (!isDesktop) {
+                previousWatchFaceSource.value = newWatchFaceSource
+                newWatchFaceSource = value
+            }
+        }
+    }
+    Loader {
+        id: watchface
+        anchors.fill: parent
+        active: isDesktop
+        visible: watchfaceMode
+        opacity: visible ? 1.0 : 0.0
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+    }
+    Timer {
+        id: watchfaceTimer
+        interval: 150
+        repeat: false
+        onTriggered: if (isDesktop) watchface.source = previousWatchFaceSource.value
+    }
+    Connections {
+        target: Lipstick.compositor
+        onDisplayOff: watchfaceMode = true
+    }
 
     Item {
         id: logic
@@ -24,7 +66,6 @@ Item {
         // Contains the empty grid cells
         // This is an array of indices.
         property var emptyGridCells: []
-
 
         ConfigurationValue {
             id: bestScoreConf
@@ -207,13 +248,16 @@ Item {
                 logic.randCell()
             }
         }
-
-        Component.onCompleted: if (!isSettings) reset()
     }
 
     Item {
         id: scoreBoard
         anchors.fill: parent
+
+        visible: !watchfaceMode
+        opacity: visible ? 1.0 : 0.0
+
+        Behavior on opacity { NumberAnimation { duration: 200 } }
         Rectangle {
             x: parent.width*0.35
             y: 0
@@ -221,6 +265,7 @@ Item {
             height: parent.height*0.12
             radius: 3
             color: "#bbada0"
+
             Text {
                 anchors.top: parent.top
                 anchors.topMargin: parent.height*0.1
@@ -244,6 +289,7 @@ Item {
                 font.pixelSize: 20
             }
         }
+
         Rectangle {
             x: parent.width*0.35
             y: parent.height*0.88
@@ -251,6 +297,7 @@ Item {
             height: parent.height*0.12
             radius: 3
             color: "#bbada0"
+
             Text {
                 anchors.top: parent.top
                 anchors.topMargin: parent.height*0.1
@@ -293,10 +340,12 @@ Item {
             topMargin: fieldMarginHeight;
             bottomMargin: fieldMarginHeight;
         }
-
         color: "#bbada0"
         //color: "transparent"
+        visible: !watchfaceMode
+        opacity: visible ? 1.0 : 0.0
 
+        Behavior on opacity { NumberAnimation { duration: 200 } }
         Grid {
             id: grid
             anchors.fill: parent
@@ -306,13 +355,16 @@ Item {
             anchors.bottomMargin: 5
             columns: 4
             rows: 4
+
             Repeater {
                 model: grid.columns * grid.rows
+
                 Rectangle {
                     width: grid.width/grid.columns
                     height: grid.height/grid.rows
                     color: "#bbada0"
                     //color: "transparent"
+
                     Rectangle {
                         radius: 3
                         anchors.fill: parent
@@ -325,10 +377,11 @@ Item {
                 }
             }
         }
+
         Repeater {
             id: cellsGrid
             model: grid.columns * grid.rows
-            property var backgrounds: {}
+
             Rectangle {
                 property bool animateMove: true
                 property int x1: -1
@@ -352,9 +405,10 @@ Item {
                        val == 1024 ? "#edc53f" :
                                      "#edc22e" // 2048
                 scale: val ? (pop ? 1.1 : 1) : 0
-                onScaleChanged: if (scale >= 1.1) pop = false
                 radius: 3
                 visible: ((x1 != -1) && (y1 !=-1))
+                onScaleChanged: if (scale >= 1.1) pop = false
+
                 Behavior on x { enabled: animateMove; NumberAnimation { duration: 100} }
                 Behavior on y { enabled: animateMove; NumberAnimation { duration: 100} }
                 Behavior on scale { NumberAnimation { duration: 100} }
@@ -373,92 +427,98 @@ Item {
                 }
             }
         }
+    }
 
-        MouseArea {
-            width: parent.width
-            height: parent.height
-            anchors.centerIn: parent
+    MouseArea {
+        width: board.width
+        height: board.height
+        anchors.centerIn: board
 
-            property bool swipeMode: !isDesktop
+        property bool swipeMode: !isDesktop
 
-            property int threshold: width*0.01
-            property string gesture: ""
-            property int value: 0
-            property bool horizontal: false
+        property int threshold: width*0.01
+        property string gesture: ""
+        property int value: 0
+        property bool horizontal: false
 
-            property int initialX: 0
-            property int initialY: 0
-            property int deltaX: 0
-            property int deltaY: 0
+        property int initialX: 0
+        property int initialY: 0
+        property int deltaX: 0
+        property int deltaY: 0
 
-            onPressed: {
-                gesture = ""
-                value = 0
-                initialX = 0
-                initialY = 0
-                deltaX = 0
-                deltaY = 0
-                initialX = mouse.x
-                initialY = mouse.y
-            }
-
-            onPositionChanged: {
-                deltaX = mouse.x - initialX
-                deltaY = mouse.y - initialY
-                horizontal = Math.abs(deltaX) > Math.abs(deltaY)
-                if (horizontal) value = deltaX
-                else value = deltaY
-            }
-
-            onReleased: {
-                if (!swipeMode) {
-                    var centerY = initialY - parent.height/2
-                    var centerX = initialX - parent.width/2
-                    horizontal = Math.abs(centerX) > Math.abs(centerY)
-                    if (horizontal) value = centerX
-                    else value = centerY
-                }
-                if (value > threshold && horizontal) {
-                    gesture = "right"
-                } else if (value < -threshold && horizontal) {
-                    gesture = "left"
-                } else if (value > threshold) {
-                    gesture = "down"
-                } else if (value < -threshold) {
-                    gesture = "up"
-                } else {
-                    return
-                }
-                logic.move(gesture)
-            }
+        onPressed: {
+            gesture = ""
+            value = 0
+            initialX = 0
+            initialY = 0
+            deltaX = 0
+            deltaY = 0
+            initialX = mouse.x
+            initialY = mouse.y
         }
 
-        Rectangle {
-            property string gesture: ""
-            focus: true
-            Keys.onPressed: {
-                event.accepted = true
-                if (event.key == Qt.Key_Right) {
-                    gesture = "right"
-                } else if (event.key == Qt.Key_Left) {
-                    gesture = "left"
-                } else if (event.key == Qt.Key_Down) {
-                    gesture = "down"
-                } else if (event.key == Qt.Key_Up) {
-                    gesture = "up"
-                } else {
-                    return
-                }
-                logic.move(gesture)
+        onPositionChanged: {
+            deltaX = mouse.x - initialX
+            deltaY = mouse.y - initialY
+            horizontal = Math.abs(deltaX) > Math.abs(deltaY)
+            if (horizontal) value = deltaX
+            else value = deltaY
+        }
+
+        onReleased: {
+            if (watchfaceMode) {
+                watchfaceMode = false
+                return
             }
+            if (!swipeMode) {
+                var centerY = initialY - board.height/2
+                var centerX = initialX - board.width/2
+                horizontal = Math.abs(centerX) > Math.abs(centerY)
+                if (horizontal) value = centerX
+                else value = centerY
+            }
+            if (value > threshold && horizontal) {
+                gesture = "right"
+            } else if (value < -threshold && horizontal) {
+                gesture = "left"
+            } else if (value > threshold) {
+                gesture = "down"
+            } else if (value < -threshold) {
+                gesture = "up"
+            } else {
+                return
+            }
+            logic.move(gesture)
+        }
+    }
+
+    Rectangle {
+        property string gesture: ""
+        focus: true
+
+        Keys.onPressed: {
+            event.accepted = true
+            if (event.key == Qt.Key_Right) {
+                gesture = "right"
+            } else if (event.key == Qt.Key_Left) {
+                gesture = "left"
+            } else if (event.key == Qt.Key_Down) {
+                gesture = "down"
+            } else if (event.key == Qt.Key_Up) {
+                gesture = "up"
+            } else {
+                return
+            }
+            logic.move(gesture)
         }
     }
 
     Rectangle {
         id: gameOver
         anchors.fill: parent
-        visible: false
+        visible: false && watchfaceMode
         opacity: visible ? 0.8 : 0.0
+
         Behavior on opacity { NumberAnimation { duration: 200 } }
         Text {
             anchors.top: parent.top
@@ -477,6 +537,7 @@ Item {
             y: parent.height*0.5
             width: parent.width*0.4
             height: parent.height*0.15
+
             Text {
                 anchors.top: parent.top
                 width: parent.width
@@ -495,5 +556,11 @@ Item {
                 onClicked: logic.reset()
             }
         }
+    }
+
+    Component.onCompleted: {
+        if (!isSettings) logic.reset()
+        newWatchFaceSource = currentWatchFaceSource.value
+        watchfaceTimer.start()
     }
 }
