@@ -1,4 +1,5 @@
 import QtQuick 2.9
+import Nemo.Configuration 1.0
 
 Item {
     id: main
@@ -8,6 +9,7 @@ Item {
         id: logic
 
         property var score: 0
+        property alias bestScore: bestScoreConf.value
 
         property var rows: 4
         property var cols: 4
@@ -19,6 +21,13 @@ Item {
         // Contains the empty grid cells
         // This is an array of indices.
         property var emptyGridCells: []
+
+
+        ConfigurationValue {
+            id: bestScoreConf
+            key: "/2048/bestScore"
+            defaultValue: 0
+        }
 
         function movePossible() {
             for (var x=0; x<rows; x++) {
@@ -145,6 +154,8 @@ Item {
 
             if ((emptyCells.length<=1) && !movePossible()) {
                 console.log("randCell::Moving is no longer possbile! GAME OVER!!")
+                bestScore = Math.max(bestScore, score)
+                reset()
             }
         }
 
@@ -194,6 +205,71 @@ Item {
         }
 
         Component.onCompleted: reset()
+    }
+
+    Item {
+        id: scoreBoard
+        anchors.fill: parent
+        Rectangle {
+            x: parent.width*0.35
+            y: 0
+            width: parent.width*0.3
+            height: parent.height*0.12
+            radius: 3
+            color: "#bbada0"
+            Text {
+                anchors.top: parent.top
+                anchors.topMargin: parent.height*0.1
+                width: parent.width
+                color: "#eee4da"
+                text: "SCORE"
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 12
+            }
+            Text {
+                anchors.top: parent.top
+                anchors.topMargin: parent.height*0.4
+                width: parent.width
+                color: "#fff"
+                text: logic.score
+                font.bold: true
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 20
+            }
+        }
+        Rectangle {
+            x: parent.width*0.35
+            y: parent.height*0.88
+            width: parent.width*0.3
+            height: parent.height*0.12
+            radius: 3
+            color: "#bbada0"
+            Text {
+                anchors.top: parent.top
+                anchors.topMargin: parent.height*0.1
+                width: parent.width
+                color: "#fff"
+                text: logic.bestScore
+                font.bold: true
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 20
+            }
+            Text {
+                anchors.top: parent.top
+                anchors.topMargin: parent.height*0.6
+                width: parent.width
+                color: "#eee4da"
+                text: "BEST"
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: 12
+            }
+        }
     }
 
     Rectangle {
