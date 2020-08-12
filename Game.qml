@@ -1,10 +1,8 @@
 import QtQuick 2.9
 
-Rectangle {
+Item {
     id: main
-    width: 200
-    height: 200
-    color: "red"
+    anchors.fill: parent
 
     Item {
         id: logic
@@ -48,7 +46,7 @@ Rectangle {
             // If can move to empty spot or spot with same value.
             if ((cell1 !== 0 && cell1 === cell2) || (cell1 !== 0 && cell2 === 0)) {
                 cells[x1][y1] = 0;
-                console.log("moving: " + x1 + " y: "  + y1)
+                //console.log("moving: " + x1 + " y: "  + y1)
 
                 for (var i=0;i<logic.rows*logic.cols;i++) {
                     if ((cellsGrid.itemAt(i).x1 == -1) || (cellsGrid.itemAt(i).y1 == -1)) continue
@@ -56,7 +54,7 @@ Rectangle {
                         cellsGrid.itemAt(i).x1 = x2
                         cellsGrid.itemAt(i).y1 = y2
                         animationTimer.start()
-                        console.log("FOUND: " + i +" x: " + x1 + "->" + x2 +" y: " + y1 + "->" + y2)
+                        //console.log("FOUND: " + i +" x: " + x1 + "->" + x2 +" y: " + y1 + "->" + y2)
                         break
                     }
                 }
@@ -74,7 +72,7 @@ Rectangle {
                         cellsGrid.itemAt(i).pop = true
                     }
                 }
-                console.log("moveCell::Score: " + score)
+                //console.log("moveCell::Score: " + score)
                 return false;
             }
 
@@ -132,7 +130,7 @@ Rectangle {
                 }
             }
             if (!emptyCells.length) {
-                console.log("ERR!:randCell:: No more empty cells available!")
+                //console.log("ERR!:randCell:: No more empty cells available!")
                 return
             }
 
@@ -144,7 +142,7 @@ Rectangle {
             // UI
             var emptyGrid = emptyGridCells[0]
             emptyGridCells.shift()
-            console.log("randCell::Using random cell: " + emptyCell + " x: " + x + " y: " + y + " value: " + cells[x][y] + " id: " + emptyGrid)
+            //console.log("randCell::Using random cell: " + emptyCell + " x: " + x + " y: " + y + " value: " + cells[x][y] + " id: " + emptyGrid)
 
             cellsGrid.itemAt(emptyGrid).animateMove = false
             cellsGrid.itemAt(emptyGrid).val = cells[x][y]
@@ -217,10 +215,22 @@ Rectangle {
 
     Rectangle {
         id: board
-        anchors.fill: parent
+        property int fieldWidth: Math.floor(Math.sqrt(Math.pow(parent.width, 2)/2))
+        property int fieldHeight: Math.floor(Math.sqrt(Math.pow(parent.height, 2)/2))
+        property int fieldMarginWidth: (parent.width-fieldWidth)/2
+        property int fieldMarginHeight: (parent.height-fieldHeight)/2
 
-        //width: 160
-        //height: 160
+        anchors {
+            right: parent.right;
+            left: parent.left;
+            bottom: parent.bottom;
+            top: parent.top;
+            leftMargin: fieldMarginWidth;
+            rightMargin: fieldMarginWidth;
+            topMargin: fieldMarginHeight;
+            bottomMargin: fieldMarginHeight;
+        }
+
         color: "#bbada0"
         //color: "transparent"
 
