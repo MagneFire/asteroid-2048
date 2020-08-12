@@ -158,7 +158,7 @@ Item {
             if ((emptyCells.length<=1) && !movePossible()) {
                 console.log("randCell::Moving is no longer possbile! GAME OVER!!")
                 bestScore = Math.max(bestScore, score)
-                reset()
+                gameOver.visible = true
             }
         }
 
@@ -180,6 +180,7 @@ Item {
         }
 
         function reset() {
+            gameOver.visible = false
             for (var i=0;i<4;i++) {
                 cells[i] = []
                 for (var j=0;j<4;j++) {
@@ -359,7 +360,7 @@ Item {
                 Behavior on scale { NumberAnimation { duration: 100} }
                 Text {
                     anchors.fill: parent
-                    color: val <= 4 ? "#000" : "#f9f6f2"
+                    color: val <= 4 ? "#776e65" : "#f9f6f2"
                     text: parent.val
                     scale: parent.scale
                     font.bold: true
@@ -449,6 +450,49 @@ Item {
                     return
                 }
                 logic.move(gesture)
+            }
+        }
+    }
+
+    Rectangle {
+        id: gameOver
+        anchors.fill: parent
+        visible: false
+        opacity: visible ? 0.8 : 0.0
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+        Text {
+            anchors.top: parent.top
+            width: parent.width
+            height: parent.height*0.7
+            color: "#776e65"
+            text: "Game Over"
+            font.bold: true
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: parent.height/text.length
+        }
+        Rectangle {
+            color: "#8f7a66"
+            x: parent.width*0.3
+            y: parent.height*0.5
+            width: parent.width*0.4
+            height: parent.height*0.15
+            Text {
+                anchors.top: parent.top
+                width: parent.width
+                height: parent.height
+                color: "#f9f6f2"
+                text: "Try Again"
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                font.pixelSize: parent.height*0.4
+            }
+            MouseArea {
+                width: parent.width
+                height: parent.height
+                anchors.centerIn: parent
+                onClicked: logic.reset()
             }
         }
     }
