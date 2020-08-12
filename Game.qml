@@ -365,6 +365,10 @@ Item {
                     font.bold: true
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: val <= 9    ? height :
+                                    val <= 99   ? height*0.7 :
+                                    val <= 999  ? height*0.5 :
+                                                  height*0.4
                 }
             }
         }
