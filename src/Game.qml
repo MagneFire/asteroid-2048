@@ -210,7 +210,7 @@ Item {
         id: scoreBoard
         anchors.fill: parent
 
-        opacity: visible ? 1.0 : 0.0
+        opacity: 0.7
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
         Rectangle {
@@ -219,7 +219,7 @@ Item {
             width: parent.width*0.3
             height: parent.height*0.12
             radius: 3
-            color: "#bbada0"
+            color: "#af590b"
 
             Text {
                 anchors.top: parent.top
@@ -252,7 +252,7 @@ Item {
             width: parent.width*0.3
             height: parent.height*0.12
             radius: 3
-            color: "#bbada0"
+            color: "#af590b"
 
             Text {
                 anchors.top: parent.top
@@ -280,7 +280,7 @@ Item {
         }
     }
 
-    Rectangle {
+    Item {
         id: board
         property int fieldWidth: Math.floor(Math.sqrt(Math.pow(parent.width, 2)/2))
         property int fieldHeight: Math.floor(Math.sqrt(Math.pow(parent.height, 2)/2))
@@ -297,19 +297,13 @@ Item {
             topMargin: fieldMarginHeight;
             bottomMargin: fieldMarginHeight;
         }
-        color: "#bbada0"
-        opacity: visible ? 1.0 : 0.0
 
-        Behavior on opacity { NumberAnimation { duration: 200 } }
         Grid {
             id: grid
             anchors.fill: parent
-            anchors.leftMargin: 5
-            anchors.rightMargin: 5
-            anchors.topMargin: 5
-            anchors.bottomMargin: 5
             columns: 4
             rows: 4
+            opacity: 0.7
 
             Repeater {
                 model: grid.columns * grid.rows
@@ -317,7 +311,7 @@ Item {
                 Rectangle {
                     width: grid.width/grid.columns
                     height: grid.height/grid.rows
-                    color: "#bbada0"
+                    color: "#af590b"
 
                     Rectangle {
                         radius: 3
@@ -345,8 +339,8 @@ Item {
                 property int prevScale: 0
                 width: grid.width/grid.columns - 10
                 height: grid.height/grid.rows - 10
-                x: 10 + x1*(grid.width/grid.columns)
-                y: 10 + y1*(grid.height/grid.rows)
+                x: 5 + x1*(grid.width/grid.columns)
+                y: 5 + y1*(grid.height/grid.rows)
                 color: val == 2    ? "#eee4da" :
                        val == 4    ? "#ede0c8" :
                        val == 8    ? "#f2b179" :
