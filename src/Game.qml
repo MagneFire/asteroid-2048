@@ -271,7 +271,8 @@ Item {
                 anchors.topMargin: parent.height*0.1
                 width: parent.width
                 color: "#eee4da"
-                text: "SCORE"
+                //% "SCORE"
+                text: qsTrId("id-score")
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -314,7 +315,8 @@ Item {
                 anchors.topMargin: parent.height*0.6
                 width: parent.width
                 color: "#eee4da"
-                text: "BEST"
+                //% "BEST"
+                text: qsTrId("id-best")
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -525,7 +527,8 @@ Item {
             width: parent.width
             height: parent.height*0.7
             color: "#776e65"
-            text: "Game Over"
+            //% "Game Over"
+            text: qsTrId("id-game-over")
             font.bold: true
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -543,7 +546,8 @@ Item {
                 width: parent.width
                 height: parent.height
                 color: "#f9f6f2"
-                text: "Try Again"
+                //% "Try Again"
+                text: qsTrId("id-try-again")
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter

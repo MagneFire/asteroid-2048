@@ -3,4 +3,3 @@
  * back with the .desktop.template file into a single .desktop file. */
 
 //% "2048"
-qtTrId("id-app-launcher-name");
