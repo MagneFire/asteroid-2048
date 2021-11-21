@@ -5,50 +5,6 @@ import org.nemomobile.lipstick 0.1
 Item {
     id: main
     anchors.fill: parent
-    property bool isDesktop: (typeof(desktop) !== "undefined")
-    property bool isApp: !isDesktop && !isSettings
-    property bool isSettings: (typeof(layerStack) !== "undefined")
-
-    property bool watchfaceMode: isDesktop
-    // This holds the intermediate watchface source
-    // needed to keep track of what the previous watchface was when it changed.
-    property var newWatchFaceSource
-
-    ConfigurationValue {
-        id: previousWatchFaceSource
-        key: "/2048/watchface"
-        defaultValue: "file:///usr/share/asteroid-launcher/watchfaces/000-default-digital.qml"
-    }
-    ConfigurationValue {
-        id: currentWatchFaceSource
-        key: "/desktop/asteroid/watchface"
-        defaultValue: "file:///usr/share/asteroid-launcher/watchfaces/000-default-digital.qml"
-        onValueChanged: {
-            // Only keep track of watchface changes in non-desktop(i.e. settings) mode.
-            if (!isDesktop) {
-                previousWatchFaceSource.value = newWatchFaceSource
-                newWatchFaceSource = value
-            }
-        }
-    }
-    Loader {
-        id: watchface
-        anchors.fill: parent
-        active: isDesktop
-        visible: watchfaceMode
-        opacity: visible ? 1.0 : 0.0
-        Behavior on opacity { NumberAnimation { duration: 200 } }
-    }
-    Timer {
-        id: watchfaceTimer
-        interval: 150
-        repeat: false
-        onTriggered: if (isDesktop) watchface.source = previousWatchFaceSource.value
-    }
-    Connections {
-        target: Lipstick.compositor
-        onDisplayOff: watchfaceMode = true
-    }
 
     Item {
         id: logic
@@ -254,7 +210,6 @@ Item {
         id: scoreBoard
         anchors.fill: parent
 
-        visible: !watchfaceMode
         opacity: visible ? 1.0 : 0.0
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -343,8 +298,6 @@ Item {
             bottomMargin: fieldMarginHeight;
         }
         color: "#bbada0"
-        //color: "transparent"
-        visible: !watchfaceMode
         opacity: visible ? 1.0 : 0.0
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -365,7 +318,6 @@ Item {
                     width: grid.width/grid.columns
                     height: grid.height/grid.rows
                     color: "#bbada0"
-                    //color: "transparent"
 
                     Rectangle {
                         radius: 3
@@ -436,7 +388,7 @@ Item {
         height: board.height
         anchors.centerIn: board
 
-        property bool swipeMode: !isDesktop
+        property bool swipeMode: true
 
         property int threshold: width*0.01
         property string gesture: ""
@@ -468,10 +420,6 @@ Item {
         }
 
         onReleased: {
-            if (watchfaceMode) {
-                watchfaceMode = false
-                return
-            }
             if (!swipeMode) {
                 var centerY = initialY - board.height/2
                 var centerX = initialX - board.width/2
@@ -518,7 +466,7 @@ Item {
     Rectangle {
         id: gameOver
         anchors.fill: parent
-        visible: false && watchfaceMode
+        visible: false
         opacity: visible ? 0.8 : 0.0
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -563,8 +511,6 @@ Item {
     }
 
     Component.onCompleted: {
-        if (!isSettings) logic.reset()
-        newWatchFaceSource = currentWatchFaceSource.value
-        watchfaceTimer.start()
+        logic.reset()
     }
 }
