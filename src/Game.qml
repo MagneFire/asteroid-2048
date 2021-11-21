@@ -24,6 +24,17 @@ Item {
         property var emptyGridCells: []
 
         ConfigurationValue {
+            id: gridCells
+            key: "/2048/grid"
+            defaultValue: ""
+        }
+        ConfigurationValue {
+            id: gridScore
+            key: "/2048/score"
+            defaultValue: ""
+        }
+
+        ConfigurationValue {
             id: bestScoreConf
             key: "/2048/bestScore"
             defaultValue: 0
@@ -126,6 +137,61 @@ Item {
             }
         }
 
+        function synchronize() {
+            gridScore.value = score
+            var cellString = ""
+            for (var x=0;x<rows;x++) {
+                for (var y=0; y<cols; y++) {
+                    cellString = cellString + cells[x][y] + ","
+                }
+                cellString = cellString + ";"
+            }
+            gridCells.value = cellString
+        }
+
+        function restore() {
+            if (gridCells.value.length == 0) return false
+
+            score = gridScore.value
+            for (var i=0; i<rows*cols;i++) {
+                emptyGridCells[i] = i
+                cellsGrid.itemAt(i).x1 = -1
+                cellsGrid.itemAt(i).y1 = -1
+                cellsGrid.itemAt(i).val = 0
+            }
+
+            var emptyCells = 0
+            cells = gridCells.value.split(";")
+            for (var x=0;x<rows;x++) {
+                cells[x] = cells[x].split(",")
+                for (var y=0;y<cols;y++) {
+                    cells[x][y] = parseInt(cells[x][y])
+
+                    // UI
+                    if (cells[x][y] != 0) {
+                        var emptyGrid = emptyGridCells[0]
+                        emptyGridCells.shift()
+
+                        cellsGrid.itemAt(emptyGrid).animateMove = false
+                        cellsGrid.itemAt(emptyGrid).val = cells[x][y]
+                        cellsGrid.itemAt(emptyGrid).x1 = x
+                        cellsGrid.itemAt(emptyGrid).y1 = y
+                        cellsGrid.itemAt(emptyGrid).animateMove = true
+                    } else {
+                        emptyCells ++
+                    }
+                }
+            }
+
+            if ((emptyCells === 0) && !movePossible()) {
+                console.log("restore::Moving is no longer possbile! GAME OVER!!")
+                bestScore = Math.max(bestScore, score)
+                gameOver.visible = true
+            }
+            return true
+        }
+
+
         function randCell() {
             var emptyCells = []
             for (var x=0; x<rows; x++) {
@@ -177,11 +243,17 @@ Item {
         }
 
         function reset() {
+            if (gameOver.visible == false) {
+                if (restore()) {
+                    return
+                }
+            }
+
             gameOver.visible = false
-            for (var i=0;i<4;i++) {
-                cells[i] = []
-                for (var j=0;j<4;j++) {
-                    cells[i][j] = 0
+            for (var x=0; x<rows; x++) {
+                cells[x] = []
+                for (var y=0; y<cols; y++) {
+                    cells[x][y] = 0
                 }
             }
             score = 0
@@ -202,6 +274,7 @@ Item {
             onTriggered: {
                 logic.removeDuplicateGridCells()
                 logic.randCell()
+                logic.synchronize()
             }
         }
     }
