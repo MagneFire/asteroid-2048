@@ -317,10 +317,10 @@ Item {
                         radius: 3
                         anchors.fill: parent
                         color: "#60eee4da"
-                        anchors.leftMargin: 5
-                        anchors.rightMargin: 5
-                        anchors.topMargin: 5
-                        anchors.bottomMargin: 5
+                        anchors.leftMargin: 2.5
+                        anchors.rightMargin: 2.5
+                        anchors.topMargin: 2.5
+                        anchors.bottomMargin: 2.5
                     }
                 }
             }
@@ -337,10 +337,10 @@ Item {
                 property int val: 0
                 property bool pop: false
                 property int prevScale: 0
-                width: grid.width/grid.columns - 10
-                height: grid.height/grid.rows - 10
-                x: 5 + x1*(grid.width/grid.columns)
-                y: 5 + y1*(grid.height/grid.rows)
+                width: grid.width/grid.columns - 5
+                height: grid.height/grid.rows - 5
+                x: 2.5 + x1*(grid.width/grid.columns)
+                y: 2.5 + y1*(grid.height/grid.rows)
                 color: val == 2    ? "#eee4da" :
                        val == 4    ? "#ede0c8" :
                        val == 8    ? "#f2b179" :
