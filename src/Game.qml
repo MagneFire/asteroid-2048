@@ -5,6 +5,7 @@ import org.nemomobile.lipstick 0.1
 Item {
     id: main
     anchors.fill: parent
+    transform: Rotation { origin.x: width/2; origin.y: height/2; angle: 45}
 
     Item {
         id: logic
@@ -381,10 +382,9 @@ Item {
             Repeater {
                 model: grid.columns * grid.rows
 
-                Rectangle {
+                Item {
                     width: grid.width/grid.columns
                     height: grid.height/grid.rows
-                    color: "#af590b"
 
                     Rectangle {
                         radius: 3
@@ -410,6 +410,7 @@ Item {
                 property int val: 0
                 property bool pop: false
                 property int prevScale: 0
+                id: cell
                 width: grid.width/grid.columns - 5
                 height: grid.height/grid.rows - 5
                 x: 2.5 + x1*(grid.width/grid.columns)
@@ -433,21 +434,28 @@ Item {
                 Behavior on x { enabled: animateMove; NumberAnimation { duration: 100} }
                 Behavior on y { enabled: animateMove; NumberAnimation { duration: 100} }
                 Behavior on scale { NumberAnimation { duration: 100} }
-                Text {
-                    height: parent.height
-                    width: parent.width
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: val <= 99   ? -1 :
-                                                  val <= 999  ? 9 :
+                Item {
+                    anchors.fill: parent
+                    transform: Rotation { origin.x: width/2; origin.y: height/2; angle: -45}
+                    property alias val: cell.val
+                    Text {
+                        height: parent.height
+                        width: parent.width
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenterOffset: val <= 99   ? -1 :
+                                                    val <= 999  ? 9 :
                                                                 14
-                    color: val <= 4 ? "#776e65" : "#f9f6f2"
-                    text: parent.val
-                    scale: parent.scale
-                    font.bold: true
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: val <= 99   ? height*0.7 :
-                                    val <= 999  ? height*0.5 :
-                                                  height*0.4
+                        color: val <= 4 ? "#776e65" : "#f9f6f2"
+                        text: parent.val
+                        scale: parent.scale
+                        font.bold: true
+                        font.letterSpacing: val > 99 ? -parent.width * 0.004 :
+                                            0
+                        horizontalAlignment: Text.AlignHCenter
+                        font.pixelSize: val <= 99   ? height*0.7 :
+                                        val <= 999  ? height*0.5 :
+                                                    height*0.4
+                    }
                 }
             }
         }
