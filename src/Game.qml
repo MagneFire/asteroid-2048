@@ -288,8 +288,9 @@ Item {
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
         Rectangle {
-            x: parent.width*0.35
-            y: 0
+            transform: Rotation {origin.x: 0; origin.y: 0; angle: -90}
+            x: parent.width - height
+            y: parent.height*0.5 + width/2
             width: parent.width*0.3
             height: parent.height*0.12
             radius: 3
@@ -299,6 +300,17 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: parent.height*0.1
                 width: parent.width
+                color: "#fff"
+                text: logic.score
+                font.bold: true
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: 20
+            }
+            Text {
+                anchors.top: parent.top
+                anchors.topMargin: parent.height*0.6
+                width: parent.width
                 color: "#eee4da"
                 //% "SCORE"
                 text: qsTrId("id-score")
@@ -306,17 +318,6 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 12
-            }
-            Text {
-                anchors.top: parent.top
-                anchors.topMargin: parent.height*0.4
-                width: parent.width
-                color: "#fff"
-                text: logic.score
-                font.bold: true
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 20
             }
         }
 
@@ -442,9 +443,10 @@ Item {
                         height: parent.height
                         width: parent.width
                         anchors.verticalCenter: parent.verticalCenter
-                        anchors.verticalCenterOffset: val <= 99   ? -1 :
-                                                    val <= 999  ? 9 :
-                                                                14
+                        anchors.verticalCenterOffset: val <= 9    ? -1 :
+                                                      val <= 99   ? 5 :
+                                                      val <= 999  ? 9 :
+                                                                   14
                         color: val <= 4 ? "#776e65" : "#f9f6f2"
                         text: parent.val
                         scale: parent.scale
@@ -452,7 +454,8 @@ Item {
                         font.letterSpacing: val > 99 ? -parent.width * 0.004 :
                                             0
                         horizontalAlignment: Text.AlignHCenter
-                        font.pixelSize: val <= 99   ? height*0.7 :
+                        font.pixelSize: val <= 9    ? height*0.7 :
+                                        val <= 99   ? height*0.6 :
                                         val <= 999  ? height*0.5 :
                                                     height*0.4
                     }
