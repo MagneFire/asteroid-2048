@@ -188,6 +188,7 @@ Item {
                 console.log("restore::Moving is no longer possbile! GAME OVER!!")
                 bestScore = Math.max(bestScore, score)
                 gameOver.visible = true
+                gameOver.angle = -90
             }
             return true
         }
@@ -223,6 +224,7 @@ Item {
                 console.log("randCell::Moving is no longer possbile! GAME OVER!!")
                 bestScore = Math.max(bestScore, score)
                 gameOver.visible = true
+                gameOver.angle = -90
             }
         }
 
@@ -251,6 +253,7 @@ Item {
             }
 
             gameOver.visible = false
+            gameOver.angle = 45
             for (var x=0; x<rows; x++) {
                 cells[x] = []
                 for (var y=0; y<cols; y++) {
@@ -549,6 +552,15 @@ Item {
         anchors.fill: parent
         visible: false
         opacity: visible ? 0.8 : 0.0
+
+        property int angle: 45
+
+        transform: Rotation {
+            origin.x: width/2
+            origin.y: height/2
+            angle: gameOver.angle
+            Behavior on angle { NumberAnimation { easing.type: Easing.InCubic; duration: 600 } }
+        }
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
         Text {
