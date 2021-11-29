@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.6.0)
 
-project(asteroid-2048
+project(asteroid-diamonds
 	VERSION 0.0.1
-	DESCRIPTION "A 2048 game clone for AsteroidOS")
+	DESCRIPTION "A 2048 inspired game for AsteroidOS")
 
 find_package(ECM REQUIRED NO_MODULE)
 find_package(AsteroidApp REQUIRED)
@@ -18,6 +18,6 @@ include(AsteroidTranslations)
 add_subdirectory(src)
 
 build_translations(i18n)
-generate_desktop(${CMAKE_SOURCE_DIR} asteroid-2048)
+generate_desktop(${CMAKE_SOURCE_DIR} asteroid-diamonds)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
